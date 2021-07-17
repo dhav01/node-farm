@@ -36,9 +36,40 @@ replaceTemplate = (tempCard, element) => {
   return output
 }
 
+/**
+  * AS url.parse is deprecated, we need to use the following syntax:
+  * const server = http.createServer((req, res) => {
+   const baseURL = 'http://' + req.headers.host + '/';
+   const reqUrl = new URL(req.url,baseURL);
+   console.log(reqUrl);
+});
+
+you will following output
+URL {
+  href: 'http://127.0.0.1:3000/favicon.ico',
+  origin: 'http://127.0.0.1:3000',
+  protocol: 'http:',
+  username: '',
+  password: '',
+  host: '127.0.0.1:3000',
+  hostname: '127.0.0.1',
+  port: '3000',
+  pathname: '/favicon.ico',
+  search: '',
+  searchParams: URLSearchParams {},
+  hash: ''
+}
+  */
+
 const server = http.createServer((req, res) => {
-  const path = req.url
-  if (path === '/') {
+  // const pathname = req.url
+  // console.log(url.parse(req.url))
+  const baseURL = 'http://' + req.headers.host + '/'
+  const { searchParams, pathname } = new URL(req.url, baseURL)
+  // const reqUrl = new URL(req.url, baseURL)
+  // console.log(reqUrl); uncomment this code to understand why we destructured and gave searchParams and pathname name as variable
+
+  if (pathname === '/') {
     res.writeHead(200, {
       'Content-Type': 'text/html',
     })
@@ -51,17 +82,26 @@ const server = http.createServer((req, res) => {
       .join('')
     //htmlCards is an array of all the elements(in html form).... we want to convert it into string format
     //and we do that using join('') method
-    console.log(htmlCards)
+    // console.log(htmlCards)
     //before sending the final response,we need to replace card placeholder with htmlCards
     const output = tempOverview.replace('{%productCards%}', htmlCards)
     res.end(output)
   }
   //the product page
-  else if (path === '/product') {
-    res.end('this is the product page')
+  else if (pathname === '/product') {
+    // const id = searchParams.get('id')     this way you can get the current id of element
+
+    res.writeHead(200, {
+      'Content-Type': 'text/html',
+    })
+    const product = dataObj[searchParams.get('id')]
+    const output = replaceTemplate(tempProduct, product)
+    // console.log(id)
+
+    res.end(output)
   }
   //this is the res we send when our api is hit
-  else if (path === '/api') {
+  else if (pathname === '/api') {
     res.end(data)
   }
   //pages which are not found
