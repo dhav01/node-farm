@@ -3,6 +3,9 @@ const url = require('url')
 
 const fs = require('fs')
 
+//importing replaceTemplate module that we created
+const replaceTemplate = require('../modules.js/replaceTemplates')
+
 const data = fs.readFileSync(`../dev-data/data.json`, 'utf-8')
 const tempOverview = fs.readFileSync(
   `../NODE-Farm/templates/template-overview.html`,
@@ -17,24 +20,6 @@ const tempCard = fs.readFileSync(
   'utf-8'
 )
 const dataObj = JSON.parse(data)
-
-//replace template function
-replaceTemplate = (tempCard, element) => {
-  //here we want to replace all the placeholders , not only first one thats why we need to use /g (to make it global)
-  let output = tempCard.replace(/{%productName%}/g, element.productName)
-  output = output.replace(/{%productImage%}/g, element.image)
-  output = output.replace(/{%productDescription%}/g, element.description)
-  output = output.replace(/{%productPrice%}/g, element.price)
-  output = output.replace(/{%productQuantity%}/g, element.quantity)
-  output = output.replace(/{%productFrom%}/g, element.from)
-  output = output.replace(/{%productId%}/g, element.id)
-  output = output.replace(/{%productNutrients%}/g, element.nutrients)
-
-  if (!element.organic) {
-    output = output.replace(/{%notOrganic%}/g, 'not-organic')
-  }
-  return output
-}
 
 /**
   * AS url.parse is deprecated, we need to use the following syntax:
